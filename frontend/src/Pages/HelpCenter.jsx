@@ -64,6 +64,8 @@ const HelpCenter = () => {
     }
   };
 
+  const defaultServiceText = "Service Support";
+
   return (
     <>
       <section className="max-padd-container mt-16">
@@ -97,14 +99,14 @@ const HelpCenter = () => {
                   </button>
                   <button
                     className={`align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 text-xs py-3 px-6 rounded-lg border ${
-                      selectedOption === productName
+                      selectedOption === (productName || defaultServiceText)
                         ? "bg-secondary text-white"
                         : "border-gray-900 text-gray-900 hover:opacity-75"
                     }`}
                     type="button"
-                    onClick={() => handleButtonClick(productName)}
+                    onClick={() => handleButtonClick(productName || defaultServiceText)}
                   >
-                    {productName || "Service Support"}
+                    {productName || defaultServiceText}
                   </button>
                 </div>
                 <input
@@ -113,6 +115,7 @@ const HelpCenter = () => {
                   value={selectedOption}
                   readOnly
                 />
+                {/* Rest of the form remains the same */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="block antialiased font-sans text-sm leading-normal text-inherit mb-2 text-left font-medium !text-gray-900">
