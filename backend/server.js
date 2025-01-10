@@ -16,11 +16,10 @@ const port = process.env.PORT || 4000
 app.use(express.json());
 // In server.js, update your CORS configuration:
 app.use(cors({
-    origin: ['https://admin.yourchoicestar.com', 'https://www.yourchoicestar.com'],
+    origin: '*',  // More permissive for testing
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    maxAge: 86400 // 24 hours
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    credentials: true
 }));
 
 // Increase payload limit for file uploads
