@@ -16,12 +16,11 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 
 // CORS setup for specific origins (using '*' for testing all origins)
-app.use(cors({
-  origin: '*', // Allow all origins for testing
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these methods
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'], // Allow these headers
-  credentials: true, // Allow credentials (cookies, etc.)
-}));
+app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://yourchoicestar.com", "https://admin.yourchoicestar.com", "https://api.yourchoicestar.com");
+  next();
+});
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors()); // Allow all preflight OPTIONS requests
