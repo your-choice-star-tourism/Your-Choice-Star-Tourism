@@ -1,30 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import productModel from "../models/productModel.js";
 
-const uploadImages = async (files) => {
-  try {
-    const uploadPromises = files.map(async (file) => {
-      // Add timeout and size validation
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit example
-        throw new Error(`File ${file.originalname} is too large. Maximum size is 10MB`);
-      }
-      
-      const result = await cloudinary.uploader.upload(file.path, {
-        resource_type: "image",
-        timeout: 60000, // 60 second timeout
-        format: 'auto', // Let Cloudinary determine best format
-        quality: 'auto', // Automatic quality optimization
-      });
-      
-      return result.secure_url;
-    });
-
-    return await Promise.all(uploadPromises);
-  } catch (error) {
-    throw new Error(`Image upload failed: ${error.message}`);
-  }
-};
-
 // controller function to create product
 const createProduct = async (req, res) => {
   try {
