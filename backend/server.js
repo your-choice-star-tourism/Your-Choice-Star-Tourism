@@ -14,12 +14,13 @@ const port = process.env.PORT || 4000
 
 // Set up middleware first
 app.use(express.json());
-// In server.js, update your CORS configuration:
+
+// CORS setup for specific origins
 app.use(cors({
-    origin: ['https://yourchoicestar.com', 'https://api.yourchoicestar.com', 'https://admin.yourchoicestar.com'],  // More permissive for testing
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-    credentials: true
+    origin: ['https://yourchoicestar.com', 'https://api.yourchoicestar.com', 'https://admin.yourchoicestar.com'], // Allow these origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these methods
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'], // Allowed headers
+    credentials: true // Allow credentials (cookies, etc.)
 }));
 
 // Increase payload limit for file uploads
@@ -31,22 +32,17 @@ connectDB()
 connectCloudinary()
 
 // API endpoints
-app.get('/', (req,res)=>{
+app.get('/', (req, res) => {
     res.send('API successfully connected!')
 })
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Specify the allowed origin
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allowed methods
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token'); //Crucially, add 'token' here
-  next();
-});
+// Use the routers for each endpoint
 app.use('/api/user', userRouter)
 app.use('/api/product', productRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/order', orderRouter)
 
 // Start server
-app.listen(port, ()=>{
-    console.log('Server is runing on PORT: ' + port)
+app.listen(port, () => {
+    console.log('Server is running on PORT: ' + port)
 })
