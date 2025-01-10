@@ -35,6 +35,12 @@ app.get('/', (req,res)=>{
     res.send('API successfully connected!')
 })
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://admin.yourchoicestar.com'); // Specify the allowed origin
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allowed methods
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token'); //Crucially, add 'token' here
+  next();
+});
 app.use('/api/user', userRouter)
 app.use('/api/product', productRouter)
 app.use('/api/cart', cartRouter)
