@@ -111,93 +111,111 @@ const Add = ({ token }) => {
     setAddons(updatedAddons);
   };
 
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // Modified onSubmitHandler function for Add.jsx
+const onSubmitHandler = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    // Validation
+  try {
+    // Basic validation
+    if (!token) {
+      toast.error("Authentication token is missing");
+      setLoading(false);
+      return;
+    }
+
     if (image.length !== 4) {
       setImageError("You must upload exactly 4 images.");
       setLoading(false);
       return;
     }
 
-    if (description2.length < 60 || description2.length > 100) {
-      setErrorTwo("Description must be between 60 and 100 characters.");
+    if (!name || !category || category === "Select Category") {
+      toast.error("Name and category are required");
       setLoading(false);
       return;
     }
 
-    // Validate addons
-    const validAddons = addons.filter(
-      (addon) =>
-        addon.addon_name.trim() !== "" &&
-        !isNaN(addon.price) &&
-        !isNaN(addon.kidprice)
+    // Create FormData
+    const formData = new FormData();
+    
+    // Append basic fields
+    formData.append("name", name.trim());
+    formData.append("description", description.trim());
+    formData.append("description2", description2.trim());
+    formData.append("category", category);
+    formData.append("price", price || 0);
+    formData.append("kidprice", kidprice || 0);
+    formData.append("popular", popular);
+    formData.append("mostbooked", mostBooked);
+    formData.append("pickup", pickup);
+    formData.append("addquery", addquery);
+    formData.append("expectation", expectations.trim());
+
+    // Append images
+    image.forEach((img, index) => {
+      formData.append("image", img);
+    });
+
+    // Filter and process addons
+    const validAddons = addons.filter(addon => 
+      addon.addon_name.trim() !== "" && 
+      (addon.price !== "" || addon.kidprice !== "")
     );
 
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("description", description);
-      formData.append("description2", description2);
-      formData.append("price", price);
-      formData.append("kidprice", kidprice);
-      formData.append("category", category);
-      formData.append("popular", popular);
-      formData.append("mostbooked", mostBooked);
-      formData.append("pickup", pickup);
-      formData.append("addquery", addquery);
-      formData.append("expectation", expectations);
+    // Append addons as JSON string
+    formData.append("addons", JSON.stringify(validAddons));
 
-      // Append addons
-      formData.append("addons", JSON.stringify(validAddons));
-
-      // Append images
-      image.forEach((img) => {
-        formData.append("image", img);
-      });
-
-      // Append addon images
-      addons.forEach((addon, index) => {
-        if (addon.image) {
-          formData.append(`addon_image_${index}`, addon.image);
-        }
-      });
-
-      // Send form data to the backend
-      const response = await axios.post(
-        `${backend_url}/api/product/create`,
-        formData,
-        { headers: { token } }
-      );
-
-      if (response.data.success) {
-        toast.success(response.data.message);
-        // Reset form...
-        setName("");
-        setDescription("");
-        setDescription2("");
-        setPrice("");
-        setKidPrice("");
-        setCategory("Select Category");
-        setPopular(false);
-        setMostBooked(false);
-        setPickup(false);
-        setAddquery(false);
-        setExpectations("");
-        setAddons([{ addon_name: "", price: "", kidprice: "", image: "" }]);
-        setImage([]);
-      } else {
-        toast.error(response.data.message);
+    // Append addon images
+    validAddons.forEach((addon, index) => {
+      if (addon.image) {
+        formData.append(`addon_image_${index}`, addon.image);
       }
-    } catch (error) {
-      console.error(error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
+    });
+
+    // Log formData contents for debugging
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
-  };
+
+    // Make API request
+    const response = await axios.post(
+      `${backend_url}/api/product/create`,
+      formData,
+      {
+        headers: {
+          token,
+          'Content-Type': 'multipart/form-data',
+        }
+      }
+    );
+
+    if (response.data.success) {
+      toast.success(response.data.message);
+      // Reset form
+      setName("");
+      setDescription("");
+      setDescription2("");
+      setPrice("");
+      setKidPrice("");
+      setCategory("Select Category");
+      setPopular(false);
+      setMostBooked(false);
+      setPickup(false);
+      setAddquery(false);
+      setExpectations("");
+      setAddons([{ addon_name: "", price: "", kidprice: "", image: "" }]);
+      setImage([]);
+    } else {
+      throw new Error(response.data.message || "Failed to create product");
+    }
+  } catch (error) {
+    console.error("Error creating product:", error);
+    toast.error(error.response?.data?.message || error.message || "Failed to create product");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="px-2 sm:px-8 sm:mt-14 pb-16 xxs:px-9 xxs:mt-10 relative">
