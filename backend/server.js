@@ -22,6 +22,8 @@ app.use(cors({
   maxAge: 600
 }
 ))
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Connect to databases
 connectDB()
