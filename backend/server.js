@@ -17,11 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // CORS setup for specific origins
-app.use(cors({
-  origin: 'https://admin.yourchoicestar.com', // Replace with your actual frontend URL
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(cors());
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors()); // Allow all preflight OPTIONS requests
