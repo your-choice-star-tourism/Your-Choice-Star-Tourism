@@ -14,16 +14,18 @@ const port = process.env.PORT || 4000
 
 // Set up middleware first
 app.use(express.json());
+// In server.js, update your CORS configuration:
 app.use(cors({
-  origin: ['https://yourchoicestar.com', 'https://admin.yourchoicestar.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 600
-}
-))
+    origin: ['https://admin.yourchoicestar.com', 'https://www.yourchoicestar.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    maxAge: 86400 // 24 hours
+}));
+
+// Increase payload limit for file uploads
 app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Connect to databases
 connectDB()
