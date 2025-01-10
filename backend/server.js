@@ -14,7 +14,14 @@ const port = process.env.PORT || 4000
 
 // Set up middleware first
 app.use(express.json());
-app.use(cors())
+app.use(cors({
+  origin: ['https://yourchoicestar.com', 'https://admin.yourchoicestar.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 600
+}
+))
 
 // Connect to databases
 connectDB()
