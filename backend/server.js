@@ -16,7 +16,7 @@ const port = process.env.PORT || 4000
 app.use(express.json());
 // In server.js, update your CORS configuration:
 app.use(cors({
-    origin: '*',  // More permissive for testing
+    origin: ['https://yourchoicestar.com', 'https://api.yourchoicestar.com', 'https://admin.yourchoicestar.com'],  // More permissive for testing
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     credentials: true
