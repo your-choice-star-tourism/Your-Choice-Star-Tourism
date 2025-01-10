@@ -1,48 +1,51 @@
-import express from "express"
-import cors from "cors"
-import "dotenv/config"
-import connectDB from "./config/db.js"
-import connectCloudinary from "./config/cloudinary.js"
-import userRouter from "./routes/userRoute.js"
-import productRouter from "./routes/productRoute.js"
-import cartRouter from "./routes/cartRoute.js"
-import orderRouter from "./routes/orderRoute.js"
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import connectDB from "./config/db.js";
+import connectCloudinary from "./config/cloudinary.js";
+import userRouter from "./routes/userRoute.js";
+import productRouter from "./routes/productRoute.js";
+import cartRouter from "./routes/cartRoute.js";
+import orderRouter from "./routes/orderRoute.js";
 
 // App configuration
-const app = express()
-const port = process.env.PORT || 4000
+const app = express();
+const port = process.env.PORT || 4000;
 
-// Set up middleware first
+// Set up middleware
 app.use(express.json());
 
-// CORS setup for specific origins
+// CORS setup for specific origins (using '*' for testing all origins)
 app.use(cors({
-    origin: ['https://yourchoicestar.com', 'https://api.yourchoicestar.com', 'https://admin.yourchoicestar.com'], // Allow these origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these methods
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'], // Allowed headers
-    credentials: true // Allow credentials (cookies, etc.)
+  origin: '*', // Allow all origins for testing
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these methods
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'], // Allow these headers
+  credentials: true, // Allow credentials (cookies, etc.)
 }));
+
+// Handle preflight requests (OPTIONS)
+app.options('*', cors()); // Allow all preflight OPTIONS requests
 
 // Increase payload limit for file uploads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Connect to databases
-connectDB()
-connectCloudinary()
+connectDB();
+connectCloudinary();
 
 // API endpoints
 app.get('/', (req, res) => {
-    res.send('API successfully connected!')
-})
+  res.send('API successfully connected!');
+});
 
 // Use the routers for each endpoint
-app.use('/api/user', userRouter)
-app.use('/api/product', productRouter)
-app.use('/api/cart', cartRouter)
-app.use('/api/order', orderRouter)
+app.use('/api/user', userRouter);
+app.use('/api/product', productRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/order', orderRouter);
 
 // Start server
 app.listen(port, () => {
-    console.log('Server is running on PORT: ' + port)
-})
+  console.log('Server is running on PORT: ' + port);
+});
