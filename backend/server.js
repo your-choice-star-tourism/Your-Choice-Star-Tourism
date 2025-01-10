@@ -17,10 +17,6 @@ app.use(express.json());
 
 // CORS setup for specific origins (using '*' for testing all origins)
 app.use(cors());
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://yourchoicestar.com", "https://admin.yourchoicestar.com", "https://api.yourchoicestar.com");
-  next();
-});
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors()); // Allow all preflight OPTIONS requests
