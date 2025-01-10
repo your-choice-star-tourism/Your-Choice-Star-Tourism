@@ -36,7 +36,7 @@ app.get('/', (req,res)=>{
 })
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://admin.yourchoicestar.com'); // Specify the allowed origin
+  res.header('Access-Control-Allow-Origin', '*'); // Specify the allowed origin
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allowed methods
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token'); //Crucially, add 'token' here
   next();
