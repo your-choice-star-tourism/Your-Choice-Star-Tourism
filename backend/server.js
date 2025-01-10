@@ -16,18 +16,7 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS setup for specific origins
-// CORS configuration to allow all origins
-const corsOptions = {
-  origin: '*',  // Allow all origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  maxAge: 86400 // 24 hours
-};
-
-// Apply CORS configuration
-app.use(cors(corsOptions));
+app.use(cors());
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors()); // Allow all preflight OPTIONS requests
