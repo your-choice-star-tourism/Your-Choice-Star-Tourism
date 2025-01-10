@@ -180,7 +180,7 @@ const onSubmitHandler = async (e) => {
 
     // Make API request
     const response = await axios.post(
-      `${backend_url}/api/product/create`,
+      `https://api.yourchoicestar.com/api/product/create`,
       formData,
       {
         headers: {
