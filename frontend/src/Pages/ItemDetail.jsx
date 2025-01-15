@@ -139,13 +139,6 @@ const ItemDetail = () => {
         {item.addons?.map((addon, index) => (
           <div className="bg-white p-2 rounded-lg mb-4" key={index}>
             <div className="flex gap-x-3">
-              <div className="flex items-start gap-6">
-                <img
-                  src={addon.image}
-                  alt={addon.addon_name}
-                  className="h-16 w-16 rounded xxs:hidden sm:block"
-                />
-              </div>
               <div className="flex flex-col w-full mt-2">
                 <p className="font-bold text-black line-clamp-1 w-[18rem]">
                   {addon.addon_name}
