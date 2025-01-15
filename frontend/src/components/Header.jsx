@@ -51,7 +51,7 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 w-full left-0 right-0 z-50 bg-white ${
-        active ? 'bg-white py-0.5 px-2.5' : 'bg-primary px-2.5'
+        active ? 'bg-white py-0.5 px-[0.4px]' : 'bg-primary px-[0.4px]'
       } flexBetween border-b border-slate-900/10 rounded transition-all duration-300 sm:px-16`}
     >
       {/* Logo */}
@@ -59,7 +59,7 @@ const Header = () => {
         <img
           src={logo}
           alt="Company Logo"
-          width={130}
+          width={110}
           className='sm:flex mr-2'
         />
       </Link>
@@ -78,7 +78,7 @@ const Header = () => {
       </div>
 
       {/* Right Side */}
-      <div className='flex-1 flex items-center justify-end gap-x-3 sm:gap-x-10'>
+      <div className='flex-1 flex items-center justify-end gap-x-2 sm:gap-x-10'>
         <CgMenuLeft
           onClick={toggleMenu}
           className='text-2xl xl:hidden cursor-pointer'
@@ -94,7 +94,7 @@ const Header = () => {
                 <TbUserCircle className='text-[29px] cursor-pointer' />
               </div>
             ) : (
-              <button onClick={() => navigate('/login')} className='btn-outline flexCenter gap-x-2 xxs:text-[12px]'>
+              <button onClick={() => navigate('/login')} className='btn-outline flexCenter gap-x-1 xxs:text-[12px]'>
                 Login <RiUserLine />
               </button>
             )}
@@ -114,7 +114,7 @@ const Header = () => {
         </div>
 
     {/* Currency Dropdown */}
-    <div className='relative'>
+    <div className='relative xxs:text-[12px]'>
       <select
         value={selectedCurrency}
         onChange={handleCurrencyChange}
