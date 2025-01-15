@@ -686,6 +686,7 @@ export const FOOTER_LINKS = [
 export const FOOTER_CONTACT_INFO = {
   title: "Contact Us",
   links: [
+    { label: "Landline", value: "04-770-5677" },
     { label: "WhatsApp - (Jitesh)", value: "+971 4 770 5677" },
     { label: "Email", value: "booking@yourchoicestar.com" },
   ],
