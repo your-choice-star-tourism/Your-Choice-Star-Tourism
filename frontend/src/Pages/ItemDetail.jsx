@@ -140,7 +140,7 @@ const ItemDetail = () => {
           <div className="bg-white p-2 rounded-lg mb-4" key={index}>
             <div className="flex gap-x-3">
               <div className="flex flex-col w-full mt-2">
-                <p className="font-bold text-black line-clamp-1 w-[18rem]">
+                <p className="font-bold text-black w-[18rem]">
                   {addon.addon_name}
                 </p>
                 <div className="flex items-center justify-between mt-3">
