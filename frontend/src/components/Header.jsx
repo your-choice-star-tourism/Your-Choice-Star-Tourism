@@ -59,7 +59,7 @@ const Header = () => {
         <img
           src={logo}
           alt="Company Logo"
-          width={120}
+          width={130}
           className='sm:flex mr-2'
         />
       </Link>
