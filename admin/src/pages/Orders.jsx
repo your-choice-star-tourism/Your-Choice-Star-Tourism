@@ -73,7 +73,7 @@ const Orders = ({ token }) => {
                       {item.isAddon ? item.addon_name : item.name} x{" "}
                       {item.quantity}
                       <span className="ml-1">
-                        Person
+                        Quantity
                       </span>
                     </p>
                   ))}
