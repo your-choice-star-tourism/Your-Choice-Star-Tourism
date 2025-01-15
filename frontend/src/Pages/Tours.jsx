@@ -13,11 +13,11 @@ const Tours = () => {
   const [sortType, setSortType] = useState("relevant");
   const [filterBooks, setFilterBooks] = useState([]);
   const [search, setSearch] = useState("");
-  const [visibleItems, setVisibleItems] = useState(25); // Number of initially visible items
-  const itemsPerPage = 25; // Number of items to load on "Load More"
+  const [visibleItems, setVisibleItems] = useState(25);
+  const itemsPerPage = 25;
 
-  const toggleFilter = (value, setState) => {
-    setState((prev) =>
+  const toggleFilter = (value) => {
+    setCategory((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
         : [...prev, value]
@@ -45,7 +45,7 @@ const Tours = () => {
       case "high":
         return bookList.sort((a, b) => b.price - a.price);
       default:
-        return bookList; // default that is relevant
+        return bookList;
     }
   };
 
@@ -53,19 +53,16 @@ const Tours = () => {
     let filtered = applyFilters();
     let sorted = applySorting(filtered);
     setFilterBooks(sorted);
-    setVisibleItems(25); // Reset visible items when filters change
+    setVisibleItems(25);
   }, [category, sortType, books, search]);
 
-  // get tours to display
   const getVisibleBooks = () => filterBooks.slice(0, visibleItems);
 
-  // Load more books
   const loadMoreBooks = () => setVisibleItems((prev) => prev + itemsPerPage);
 
   return (
     <section className="max-padd-container bg-white" id="tours">
       <div className="pt-40">
-        {/* search box */}
         <div className="w-full max-w-2xl flexCenter">
           <div className="inline-flex items-center justify-center bg-primary overflow-hidden w-full rounded-full p-4 px-5">
             <div className="text-lg cursor-pointer">
@@ -73,7 +70,7 @@ const Tours = () => {
             </div>
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value, setCategory)}
+              onChange={(e) => setSearch(e.target.value)}
               type="text"
               placeholder="Search here..."
               className="border-none outline-none w-full text-sm pl-4 bg-primary"
@@ -84,31 +81,25 @@ const Tours = () => {
           </div>
         </div>
 
-        {/* categories filter */}
         <div className="my-16 xxs:my-14 w-100">
           <h4 className="h4 mb-6 sm:flex">Categories:</h4>
           <div className="custom-scrollbar overflow-x-scroll w-auto">
             <div className="flex sm:flexStart flex-nowrap gap-x-6">
               {categories.map((cat) => (
                 <label key={cat.name} className="shrink-0">
-                  <div className="flexCenter flex-col gap-1 cursor-pointer">
-                    <div
-                      className="bg-primary h-10 flexCenter rounded-md mb-3 px-3 cursor-pointer"
-                      onClick={() => toggleFilter(cat.name, setCategory)}
-                    >
-                      <label className="flex items-center w-full cursor-pointer">
+                  <div className="flexCenter flex-col gap-1">
+                    <div className="bg-primary h-10 flexCenter rounded-md mb-3 px-3">
+                      <div className="flex items-center w-full cursor-pointer">
                         <input
                           type="checkbox"
-                          value={cat.name}
-                          onChange={(e) =>
-                            toggleFilter(e.target.value, setCategory)
-                          }
+                          checked={category.includes(cat.name)}
+                          onChange={() => toggleFilter(cat.name)}
                           className="w-4 h-4 mr-2 cat-check cursor-pointer"
                         />
                         <span className="medium-14 cat-check-name">
                           {cat.name}
                         </span>
-                      </label>
+                      </div>
                     </div>
                   </div>
                 </label>
@@ -117,9 +108,7 @@ const Tours = () => {
           </div>
         </div>
 
-        {/* book container */}
         <div className="mt-24">
-          {/* title and sort */}
           <div className="flexBetween !items-start gap-7 flex-wrap pb-16 max-sm:flexCenter text-center">
             <Title
               title1={"Our "}
@@ -139,7 +128,7 @@ const Tours = () => {
               </select>
             </div>
           </div>
-          {/* tours */}
+
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
             {getVisibleBooks().length > 0 ? (
               getVisibleBooks().map((book) => (
@@ -151,7 +140,6 @@ const Tours = () => {
           </div>
         </div>
 
-        {/* Load More Button */}
         {visibleItems < filterBooks.length && (
           <div className="flexCenter mt-14 mb-10">
             <button

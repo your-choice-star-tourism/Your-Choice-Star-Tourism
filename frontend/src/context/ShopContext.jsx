@@ -14,36 +14,27 @@ const ShopContextProvider = (props) => {
     const savedCart = localStorage.getItem('cartItems');
     return savedCart ? JSON.parse(savedCart) : {};
   });
-  const [cartItemsChild, setCartItemsChild] = useState(() => {
-    const savedChildCart = localStorage.getItem('cartItemsChild');
-    return savedChildCart ? JSON.parse(savedChildCart) : {};
-  });
 
-  // Save carts to localStorage whenever they change
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  useEffect(() => {
-    localStorage.setItem('cartItemsChild', JSON.stringify(cartItemsChild));
-  }, [cartItemsChild]);
-
   const isAddon = (itemId) => itemId.includes('_addon');
 
-  const findAddonPrice = (addonId, isChild = false) => {
+  const findAddonPrice = (addonId) => {
     const [parentId, _, addon_id] = addonId.split('_');
     const parentTour = books.find(book => book._id === parentId);
     if (parentTour && parentTour.addons) {
       const addon = parentTour.addons.find(addon => addon._id === addon_id);
       if (addon) {
-        return isChild ? addon.kidprice : addon.price;
+        return addon.price;
       }
     }
     return 0;
   };
 
   const cleanCart = useCallback((cart) => {
-    // Only keep items with quantity > 0
     const cleanedCart = Object.fromEntries(
       Object.entries(cart).filter(([_, quantity]) => quantity > 0)
     );
@@ -68,38 +59,13 @@ const ShopContextProvider = (props) => {
           { headers: { token } }
         );
       } catch (error) {
-        console.error("Error adding to adult cart:", error);
-      }
-    }
-  };
-
-  const addToCartChild = async (itemId) => {
-    setCartItemsChild(prev => {
-      const newCart = {
-        ...prev,
-        [itemId]: (prev[itemId] || 0) + 1
-      };
-      localStorage.setItem('cartItemsChild', JSON.stringify(newCart));
-      return newCart;
-    });
-
-    if (token) {
-      try {
-        await axios.post(
-          `${backendUrl}/api/cart/add`,
-          { itemId, isChild: true },
-          { headers: { token } }
-        );
-      } catch (error) {
-        console.error("Error adding to child cart:", error);
+        console.error("Error adding to cart:", error);
       }
     }
   };
 
   const getCartCount = () => {
-    const adultCount = Object.values(cartItems).reduce((sum, count) => sum + (count || 0), 0);
-    const childCount = Object.values(cartItemsChild).reduce((sum, count) => sum + (count || 0), 0);
-    return adultCount + childCount;
+    return Object.values(cartItems).reduce((sum, count) => sum + (count || 0), 0);
   };
 
   const getMainItemsTotal = () => {
@@ -114,15 +80,6 @@ const ShopContextProvider = (props) => {
       }
     }
 
-    for (const item in cartItemsChild) {
-      if (cartItemsChild[item] > 0 && !isAddon(item)) {
-        const itemInfo = books.find((book) => book._id === item);
-        if (itemInfo) {
-          totalAmount += itemInfo.kidprice * cartItemsChild[item];
-        }
-      }
-    }
-
     return totalAmount;
   };
 
@@ -133,51 +90,6 @@ const ShopContextProvider = (props) => {
       if (cartItems[item] > 0 && isAddon(item)) {
         const addonPrice = findAddonPrice(item);
         totalAmount += addonPrice * cartItems[item];
-      }
-    }
-
-    for (const item in cartItemsChild) {
-      if (cartItemsChild[item] > 0 && isAddon(item)) {
-        const addonPrice = findAddonPrice(item, true);
-        totalAmount += addonPrice * cartItemsChild[item];
-      }
-    }
-
-    return totalAmount;
-  };
-
-  const getAdultItemsTotal = () => {
-    let totalAmount = 0;
-
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        if (isAddon(item)) {
-          totalAmount += findAddonPrice(item) * cartItems[item];
-        } else {
-          const itemInfo = books.find((book) => book._id === item);
-          if (itemInfo) {
-            totalAmount += itemInfo.price * cartItems[item];
-          }
-        }
-      }
-    }
-
-    return totalAmount;
-  };
-
-  const getChildItemsTotal = () => {
-    let totalAmount = 0;
-
-    for (const item in cartItemsChild) {
-      if (cartItemsChild[item] > 0) {
-        if (isAddon(item)) {
-          totalAmount += findAddonPrice(item, true) * cartItemsChild[item];
-        } else {
-          const itemInfo = books.find((book) => book._id === item);
-          if (itemInfo) {
-            totalAmount += itemInfo.kidprice * cartItemsChild[item];
-          }
-        }
       }
     }
 
@@ -214,52 +126,14 @@ const ShopContextProvider = (props) => {
             itemId,
             quantity: newQuantity,
             isChild: false,
-            cleanCart: true // Add this flag to signal backend cleanup
+            cleanCart: true
           },
           {
             headers: { token }
           }
         );
       } catch (error) {
-        console.error("Error updating adult cart:", error);
-      }
-    }
-  }, [token, backendUrl, cleanCart]);
-  
-  const updateQuantityChild = useCallback(async (itemId, quantity, callback) => {
-    const newQuantity = Math.max(0, quantity || 0);
-    
-    setCartItemsChild(prev => {
-      const newCart = cleanCart({
-        ...prev,
-        [itemId]: newQuantity
-      });
-      
-      localStorage.setItem('cartItemsChild', JSON.stringify(newCart));
-      
-      if (callback) {
-        callback(newCart);
-      }
-      
-      return newCart;
-    });
-  
-    if (token) {
-      try {
-        await axios.post(
-          `${backendUrl}/api/cart/update`,
-          {
-            itemId,
-            quantity: newQuantity,
-            isChild: true,
-            cleanCart: true // Add this flag to signal backend cleanup
-          },
-          {
-            headers: { token }
-          }
-        );
-      } catch (error) {
-        console.error("Error updating child cart:", error);
+        console.error("Error updating cart:", error);
       }
     }
   }, [token, backendUrl, cleanCart]);
@@ -277,13 +151,9 @@ const ShopContextProvider = (props) => {
       if (response.data.success) {
         const { cartData } = response.data;
         const adultCart = cartData.adult || {};
-        const childCart = cartData.child || {};
         
         setCartItems(adultCart);
-        setCartItemsChild(childCart);
-        
         localStorage.setItem('cartItems', JSON.stringify(adultCart));
-        localStorage.setItem('cartItemsChild', JSON.stringify(childCart));
       }
     } catch (error) {
       console.error('Error fetching user cart:', error.response?.data || error.message);
@@ -321,19 +191,13 @@ const ShopContextProvider = (props) => {
     token,
     setToken,
     cartItems,
-    cartItemsChild,
     setCartItems,
-    setCartItemsChild,
     addToCart,
-    addToCartChild,
     getCartCount,
     getCartAmount,
     getMainItemsTotal,
     getAddonsTotal,
-    getAdultItemsTotal,
-    getChildItemsTotal,
     updateQuantity,
-    updateQuantityChild,
     backendUrl,
   };
 

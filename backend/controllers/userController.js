@@ -130,7 +130,7 @@ const requestPasswordReset = async (req, res) => {
             expiresAt: Date.now() + (8 * 60 * 1000)
         });
         
-        const resetLink = `https://yourchoicestar.com/reset-password/${resetToken}`;
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         console.log('Reset link generated:', resetLink);
         
         const mailOptions = {

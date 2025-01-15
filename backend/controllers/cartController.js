@@ -1,84 +1,75 @@
-import userModel from "../models/userModel.js"
+import userModel from "../models/userModel.js";
 
 const cleanCart = (cart) => {
     return Object.fromEntries(
         Object.entries(cart || {}).filter(([_, quantity]) => quantity > 0)
     );
-}
+};
 
 const addToCart = async (req, res) => {
     try {
-        const {userId, itemId, isChild = false} = req.body
+        const { userId, itemId } = req.body;
 
-        const userData = await userModel.findById(userId)
-        const cartType = isChild ? 'child' : 'adult'
+        const userData = await userModel.findById(userId);
         
-        if (!userData.cartData[cartType]) {
-            userData.cartData[cartType] = {}
+        if (!userData.cartData) {
+            userData.cartData = {};
         }
 
-        if (userData.cartData[cartType][itemId]) {
-            userData.cartData[cartType][itemId] += 1
+        if (userData.cartData[itemId]) {
+            userData.cartData[itemId] += 1;
         } else {
-            userData.cartData[cartType][itemId] = 1
+            userData.cartData[itemId] = 1;
         }
 
-        // Clean the cart before saving
-        userData.cartData[cartType] = cleanCart(userData.cartData[cartType])
+        userData.cartData = cleanCart(userData.cartData);
 
-        await userModel.findByIdAndUpdate(userId, {cartData: userData.cartData})
-        res.json({success: true, message: 'Added to cart'})
+        await userModel.findByIdAndUpdate(userId, { cartData: userData.cartData });
+        res.json({ success: true, message: 'Added to cart' });
     } catch (error) {
-        console.log(error)
-        res.json({success: false, message: error.message})
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 const updateCart = async (req, res) => {
     try {
-        const {userId, itemId, quantity, isChild = false} = req.body
+        const { userId, itemId, quantity } = req.body;
 
-        const userData = await userModel.findById(userId)
-        const cartType = isChild ? 'child' : 'adult'
-
-        if (!userData.cartData[cartType]) {
-            userData.cartData[cartType] = {}
+        const userData = await userModel.findById(userId);
+        
+        if (!userData.cartData) {
+            userData.cartData = {};
         }
 
         if (quantity > 0) {
-            userData.cartData[cartType][itemId] = quantity
+            userData.cartData[itemId] = quantity;
         } else {
-            // Remove item if quantity is 0
-            delete userData.cartData[cartType][itemId]
+            delete userData.cartData[itemId];
         }
 
-        // Clean the cart before saving
-        userData.cartData[cartType] = cleanCart(userData.cartData[cartType])
+        userData.cartData = cleanCart(userData.cartData);
 
-        await userModel.findByIdAndUpdate(userId, {cartData: userData.cartData})
-        res.json({success: true, message: 'Your Cart has been updated'})
-
+        await userModel.findByIdAndUpdate(userId, { cartData: userData.cartData });
+        res.json({ success: true, message: 'Your Cart has been updated' });
     } catch (error) {
-        console.log(error)
-        res.json({success: false, message: error.message})
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 const getUserCart = async (req, res) => {
     try {
-        const {userId} = req.body
+        const { userId } = req.body;
 
-        const userData = await userModel.findById(userId)
-        const cartData = {
-            adult: cleanCart(userData.cartData.adult),
-            child: cleanCart(userData.cartData.child)
-        }
+        const userData = await userModel.findById(userId);
+        const cartData = cleanCart(userData.cartData || {});
         
-        res.json({success: true, cartData})
+        res.json({ success: true, cartData });
     } catch (error) {
-        console.log(error)
-        res.json({success: false, message: error.message})
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 export { addToCart, updateCart, getUserCart };

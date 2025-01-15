@@ -1,13 +1,16 @@
 import React, { useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { RiAddLine, RiShoppingBag4Line } from "react-icons/ri";
+import { FaMinus, FaPlus } from "react-icons/fa6";
 import { ShopContext } from "../context/ShopContext";
+import { CurrencyContext } from "../context/CurrencyContext";
 import Footer from "../components/Footer";
 
 const ItemDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, currency, books } = useContext(ShopContext);
+  const { addToCart, cartItems, updateQuantity, books } = useContext(ShopContext);
+  const { selectedCurrency, convertPrice } = useContext(CurrencyContext);
   const [currentImage, setCurrentImage] = useState(null);
   const item = books.find((item) => item._id === id);
 
@@ -28,11 +31,41 @@ const ItemDetail = () => {
 
   const handleBookTour = () => {
     if (item.addquery) {
-      // Navigate to HelpCenter with the item name as state
       navigate('/HelpCenter', { state: { productName: item.name } });
     } else {
       addToCart(item._id);
     }
+  };
+
+  const showMainButton = !item.addons || item.addons.length === 0;
+
+  const getAddonQuantity = (addonId) => {
+    const fullAddonId = `${item._id}_addon_${addonId}`;
+    return cartItems[fullAddonId] || 0;
+  };
+
+  const renderQuantitySelector = (addon) => {
+    const fullAddonId = `${item._id}_addon_${addon._id}`;
+    const quantity = getAddonQuantity(addon._id);
+
+    return (
+      <div className="flex items-center ring-1 ring-slate-900/5 rounded-md overflow-hidden bg-primary">
+        <button
+          onClick={() => updateQuantity(fullAddonId, Math.max(0, quantity - 1))}
+          className="p-1.5 bg-white rounded-md shadow-md"
+        >
+          <FaMinus className="text-xs" />
+        </button>
+        <p className="px-2">{quantity}</p>
+        <button
+          onClick={() => updateQuantity(fullAddonId, quantity + 1)}
+          className="p-1.5 bg-white rounded-md shadow-md"
+        >
+          <FaPlus className="text-xs" />
+        </button>
+        <p className="px-2">Person</p>
+      </div>
+    );
   };
 
   return (
@@ -67,25 +100,21 @@ const ItemDetail = () => {
               <p className="text-gray-600 mb-4">
                 Category: <span className="font-bold">{item.category}</span>
               </p>
-              <div className="flex items-center space-x-4 mb-6">
-              <button
-                  className="flex gap-2 items-center text-white px-6 py-2 rounded-md item-detail-btn"
-                  onClick={handleBookTour}
-                >
-                  {item.addquery ? "Ask Query" : "Add To"} <RiShoppingBag4Line className="text-[20px]" />
-                </button>
-              </div>
-              <div className="mb-4 space-y-2">
+              {showMainButton && (
+                <div className="flex items-center space-x-4 mb-6">
+                  <button
+                    className="flex gap-2 items-center text-white px-6 py-2 rounded-md item-detail-btn"
+                    onClick={handleBookTour}
+                  >
+                    {item.addquery ? "Ask Query" : "Add To"} <RiShoppingBag4Line className="text-[20px]" />
+                  </button>
+                </div>
+              )}
+              <div className="mb-4">
                 <p className="text-gray-600">
-                  Adult:{" "}
+                  Price:{" "}
                   <span className="font-bold text-black">
-                    {item.price} {currency}
-                  </span>
-                </p>
-                <p className="text-gray-600">
-                  Child:{" "}
-                  <span className="font-bold text-black">
-                    {item.kidprice} {currency}
+                    {convertPrice(item.price)} {selectedCurrency}
                   </span>
                 </p>
               </div>
@@ -94,7 +123,7 @@ const ItemDetail = () => {
               </h3>
               <p className="text-gray-700 mb-6">{item.description}</p>
               <div>
-                <h3 className="text-lg font-semibold mb-2">What You'll Get:</h3>
+                <h3 className="text-lg font-semibold mb-2">Highlights:</h3>
                 <ul className="list-disc list-inside text-gray-700">
                   {item.expectations?.map((expectation, index) => (
                     <li key={index}>{expectation}</li>
@@ -114,7 +143,7 @@ const ItemDetail = () => {
                 <img
                   src={addon.image}
                   alt={addon.addon_name}
-                  className="h-24 w-24 rounded xxs:hidden sm:block"
+                  className="h-16 w-16 rounded xxs:hidden sm:block"
                 />
               </div>
               <div className="flex flex-col w-full mt-2">
@@ -122,35 +151,45 @@ const ItemDetail = () => {
                   {addon.addon_name}
                 </p>
                 <div className="flex items-center justify-between mt-3">
-                  <div>
-                    <div className="flex items-center ring-1 ring-slate-900/5 rounded-sm overflow-hidden bg-primary mb-3">
-                      <p className="px-2">
-                        Adult:{" "}
-                        <span className="text-black font-bold">
-                          {addon.price} {currency}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="flex items-center ring-1 ring-slate-900/5 rounded-sm overflow-hidden bg-primary">
-                      <p className="px-2">
-                        Child:{" "}
-                        <span className="text-black font-bold">
-                          {addon.kidprice} {currency}
-                        </span>
-                      </p>
-                    </div>
+                  <div className="flex items-center ring-1 ring-slate-900/5 rounded-sm overflow-hidden bg-primary">
+                    <p className="px-2">
+                      Price:{" "}
+                      <span className="text-black font-bold">
+                        {convertPrice(addon.price)} {selectedCurrency}
+                      </span>
+                    </p>
                   </div>
-                  <button
-                    className="flex gap-2 items-center text-white px-2 py-2 rounded-full mr-3 mb-6 item-detail-btn"
-                    onClick={() => addToCart(`${item._id}_addon_${addon._id}`)}
-                  >
-                    <RiShoppingBag4Line className="text-[20px]" />
-                  </button>
+                  <div className="-mt-2">
+                    {renderQuantitySelector(addon)}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
+      </section>
+
+      <section className="max-padd-container bg-gray-100 py-12">
+        <div className="max-w-[60rem]">
+          {item.moredetails?.map((detail, index) => (
+            <div key={index} className="mb-8">
+              <h3 className="text-2xl font-semibold mb-4">{detail.detailname}</h3>
+              {detail.detailinfo.length > 1 ? (
+                <ul className="list-disc list-inside text-gray-700">
+                  {detail.detailinfo.map((info, infoIndex) => (
+                    <li key={infoIndex}>{info}</li>
+                  ))}
+                </ul>
+              ) : (
+                detail.detailinfo.map((info, infoIndex) => (
+                  <p key={infoIndex} className="text-gray-700 mb-4">
+                    {info}
+                  </p>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="max-padd-container">

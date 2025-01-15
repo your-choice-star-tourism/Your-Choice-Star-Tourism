@@ -22,6 +22,9 @@ const Add = ({ token }) => {
   const [addons, setAddons] = useState([
     { addon_name: "", price: "", kidprice: "", image: "" },
   ]);
+  const [moredetails, setMoreDetails] = useState([
+    { detailname: "", detailinfo: [""] },
+  ]);
   const [error, setError] = useState("");
   const [errortwo, setErrorTwo] = useState("");
   const [imageError, setImageError] = useState("");
@@ -72,14 +75,28 @@ const Add = ({ token }) => {
   };
 
   const handleAddAddon = () => {
-    if (addons.length >= 6) {
-      toast.error("You can only add up to 6 addons.");
+    // Check if Query Page is selected
+    if (addquery) {
+      toast.error("You cannot add addons with Query Page");
       return;
     }
     setAddons([
       ...addons,
       { addon_name: "", price: "", kidprice: "", image: "" },
     ]);
+  };
+
+  const handleQueryPageChange = (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked && addons.length > 1) {
+      toast.error("You cannot enable Query Page while having addons");
+      return;
+    }
+    setAddquery(isChecked);
+    // If Query Page is enabled, reset addons to initial state
+    if (isChecked) {
+      setAddons([{ addon_name: "", price: "", kidprice: "", image: "" }]);
+    }
   };
 
   const handleRemoveAddon = (index) => {
@@ -111,111 +128,138 @@ const Add = ({ token }) => {
     setAddons(updatedAddons);
   };
 
-  // Modified onSubmitHandler function for Add.jsx
-const onSubmitHandler = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleAddDetail = () => {
+    setMoreDetails([...moredetails, { detailname: "", detailinfo: [""] }]);
+  };
 
-  try {
-    // Basic validation
-    if (!token) {
-      toast.error("Authentication token is missing");
-      setLoading(false);
-      return;
-    }
+  const handleRemoveDetail = (index) => {
+    setMoreDetails(moredetails.filter((_, i) => i !== index));
+  };
 
-    if (image.length !== 4) {
-      setImageError("You must upload exactly 4 images.");
-      setLoading(false);
-      return;
-    }
-
-    if (!name || !category || category === "Select Category") {
-      toast.error("Name and category are required");
-      setLoading(false);
-      return;
-    }
-
-    // Create FormData
-    const formData = new FormData();
-    
-    // Append basic fields
-    formData.append("name", name.trim());
-    formData.append("description", description.trim());
-    formData.append("description2", description2.trim());
-    formData.append("category", category);
-    formData.append("price", price || 0);
-    formData.append("kidprice", kidprice || 0);
-    formData.append("popular", popular);
-    formData.append("mostbooked", mostBooked);
-    formData.append("pickup", pickup);
-    formData.append("addquery", addquery);
-    formData.append("expectation", expectations.trim());
-
-    // Append images
-    image.forEach((img, index) => {
-      formData.append("image", img);
-    });
-
-    // Filter and process addons
-    const validAddons = addons.filter(addon => 
-      addon.addon_name.trim() !== "" && 
-      (addon.price !== "" || addon.kidprice !== "")
-    );
-
-    // Append addons as JSON string
-    formData.append("addons", JSON.stringify(validAddons));
-
-    // Append addon images
-    validAddons.forEach((addon, index) => {
-      if (addon.image) {
-        formData.append(`addon_image_${index}`, addon.image);
-      }
-    });
-
-    // Log formData contents for debugging
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-
-    // Make API request
-    const response = await axios.post(
-      `${backend_url}/api/product/create`,
-      formData,
-      {
-        headers: {
-          token,
-          'Content-Type': 'multipart/form-data',
-        }
-      }
-    );
-
-    if (response.data.success) {
-      toast.success(response.data.message);
-      // Reset form
-      setName("");
-      setDescription("");
-      setDescription2("");
-      setPrice("");
-      setKidPrice("");
-      setCategory("Select Category");
-      setPopular(false);
-      setMostBooked(false);
-      setPickup(false);
-      setAddquery(false);
-      setExpectations("");
-      setAddons([{ addon_name: "", price: "", kidprice: "", image: "" }]);
-      setImage([]);
+  const handleDetailChange = (index, field, value) => {
+    const updatedDetails = [...moredetails];
+    if (field === "detailinfo") {
+      // If the value is a string (from textarea), split it into array
+      // If it's already an array, keep it as is
+      updatedDetails[index][field] = Array.isArray(value) ? value : value.split("\n").filter(item => item.trim());
     } else {
-      throw new Error(response.data.message || "Failed to create product");
+      updatedDetails[index][field] = value;
     }
-  } catch (error) {
-    console.error("Error creating product:", error);
-    toast.error(error.response?.data?.message || error.message || "Failed to create product");
-  } finally {
-    setLoading(false);
-  }
-};
+    setMoreDetails(updatedDetails);
+  };
+
+  // Modified onSubmitHandler function for Add.jsx
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Basic validation
+      if (!token) {
+        toast.error("Authentication token is missing");
+        setLoading(false);
+        return;
+      }
+
+      if (image.length !== 4) {
+        setImageError("You must upload exactly 4 images.");
+        setLoading(false);
+        return;
+      }
+
+      if (!name || !category || category === "Select Category") {
+        toast.error("Name and category are required");
+        setLoading(false);
+        return;
+      }
+
+      // Create FormData
+      const formData = new FormData();
+
+      // Append basic fields
+      formData.append("name", name.trim());
+      formData.append("description", description.trim());
+      formData.append("description2", description2.trim());
+      formData.append("category", category);
+      formData.append("price", price || 0);
+      formData.append("kidprice", kidprice || 0);
+      formData.append("popular", popular);
+      formData.append("mostbooked", mostBooked);
+      formData.append("pickup", pickup);
+      formData.append("addquery", addquery);
+      formData.append("expectation", expectations.trim());
+      formData.append("moredetails", JSON.stringify(moredetails));
+
+      // Append images
+      image.forEach((img, index) => {
+        formData.append("image", img);
+      });
+
+      // Filter and process addons
+      const validAddons = addons.filter(
+        (addon) =>
+          addon.addon_name.trim() !== "" &&
+          (addon.price !== "" || addon.kidprice !== "")
+      );
+
+      // Append addons as JSON string
+      formData.append("addons", JSON.stringify(validAddons));
+
+      // Append addon images
+      validAddons.forEach((addon, index) => {
+        if (addon.image) {
+          formData.append(`addon_image_${index}`, addon.image);
+        }
+      });
+
+      // Log formData contents for debugging
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // Make API request
+      const response = await axios.post(
+        `${backend_url}/api/product/create`,
+        formData,
+        {
+          headers: {
+            token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        // Reset form
+        setName("");
+        setDescription("");
+        setDescription2("");
+        setPrice("");
+        setKidPrice("");
+        setCategory("Select Category");
+        setPopular(false);
+        setMostBooked(false);
+        setPickup(false);
+        setAddquery(false);
+        setExpectations("");
+        setAddons([{ addon_name: "", price: "", kidprice: "", image: "" }]);
+        setImage([]);
+        setMoreDetails([{ detailname: "", detailinfo: [""] }]);
+      } else {
+        throw new Error(response.data.message || "Failed to create product");
+      }
+    } catch (error) {
+      console.error("Error creating product:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create product"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="px-2 sm:px-8 sm:mt-14 pb-16 xxs:px-9 xxs:mt-10 relative">
@@ -240,20 +284,6 @@ const onSubmitHandler = async (e) => {
           />
         </div>
         <div className="w-full">
-          <h5 className="h5">Brief description</h5>
-          <textarea
-            onChange={handleDescriptionChange}
-            value={description}
-            rows={5}
-            placeholder="Write here..."
-            className="px-3 py-1.5 ring-1 ring-slate-900/10 rounded bg-white mt-1 w-full max-w-lg"
-          />
-          <div className="text-sm text-red-500 mt-1">{error}</div>
-          <div className="text-sm text-gray-500 mt-1">
-            Characters: {description.length}/1800
-          </div>
-        </div>
-        <div className="w-full">
           <h5 className="h5">Card description</h5>
           <textarea
             onChange={handleDescriptionChangeTwo}
@@ -268,6 +298,33 @@ const onSubmitHandler = async (e) => {
             Characters: {description2.length}/100
           </div>
         </div>
+        <div className="w-full">
+          <h5 className="h5">Brief description</h5>
+          <textarea
+            onChange={handleDescriptionChange}
+            value={description}
+            rows={5}
+            placeholder="Write here..."
+            className="px-3 py-1.5 ring-1 ring-slate-900/10 rounded bg-white mt-1 w-full max-w-lg"
+          />
+          <div className="text-sm text-red-500 mt-1">{error}</div>
+          <div className="text-sm text-gray-500 mt-1">
+            Characters: {description.length}/1800
+          </div>
+        </div>
+        
+        {/* Expectations Section */}
+        <div className="w-full">
+          <h5 className="h5">Highlights</h5>
+          <textarea
+            onChange={(e) => setExpectations(e.target.value)}
+            value={expectations}
+            placeholder="Use full stop '.' only when to start next Highlight"
+            rows={3}
+            className="px-3 py-1.5 ring-1 ring-slate-900/10 rounded bg-white mt-1 w-full max-w-lg"
+          />
+        </div>
+
         <div className="flex items-end gap-x-6">
           <div>
             <h5 className="h5">Categories And Images</h5>
@@ -335,127 +392,156 @@ const onSubmitHandler = async (e) => {
             </div>
           ))}
         </div>
-        <h5 className="h5">Pricing</h5>
+        <h5 className="h5">Show-Case Pricing</h5>
         <div className="flex items-end gap-x-6">
           <input
             onChange={(e) => setPrice(e.target.value)}
             value={price}
             type="number"
-            placeholder="Adult Price"
-            min={0}
-            className="px-3 py-1.5 ring-1 ring-slate-900/10 rounded bg-white w-28"
-          />
-          <input
-            onChange={(e) => setKidPrice(e.target.value)}
-            value={kidprice}
-            type="number"
-            placeholder="Child Price"
+            placeholder="Price"
             min={0}
             className="px-3 py-1.5 ring-1 ring-slate-900/10 rounded bg-white w-28"
           />
         </div>
+        {/* query pager */}
+        <div className="w-full mt-5">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={addquery}
+              onChange={handleQueryPageChange}
+              className="mr-2"
+            />
+            Redirect To Query Page {"( Can not add addons with this )"}
+          </label>
+        </div>
+
         {/* Addons Section */}
         <div className="w-full mt-5">
           <h5 className="h5 mb-4">Addons</h5>
-          {addons.map((addon, index) => (
-            <div key={index} className="-space-y-3">
-              {/* Name Input in separate div */}
-              <div>
-                <input
-                  type="text"
-                  name="addon_name"
-                  value={addon.addon_name}
-                  onChange={(e) => handleAddonChange(e, index)}
-                  placeholder="Name"
-                  className="px-3 py-2 border rounded w-full"
-                />
-              </div>
-
-              {/* Other Inputs */}
-              <div className="flex items-center space-x-4">
-                <input
-                  type="number"
-                  name="price"
-                  value={addon.price}
-                  onChange={(e) => handleAddonChange(e, index)}
-                  placeholder="Adult Price"
-                  className="px-3 py-2 border rounded w-full"
-                />
-                <input
-                  type="number"
-                  name="kidprice"
-                  value={addon.kidprice}
-                  onChange={(e) => handleAddonChange(e, index)}
-                  placeholder="Child Price"
-                  className="px-3 py-2 border rounded w-full"
-                />
-                <div className="relative">
-                  <label
-                    htmlFor={`addon_image_${index}`}
-                    className="cursor-pointer mx-16"
-                  >
-                    {addon.imagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={addon.imagePreview}
-                          alt="Addon preview"
-                          className="w-14 h-14 rounded-lg object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveAddonImage(index)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
-                        >
-                          <TbTrash size={12} />
-                        </button>
-                      </div>
-                    ) : (
-                      <img
-                        src={upload_icon}
-                        alt="Upload icon"
-                        className="w-14 h-14"
-                      />
-                    )}
-                    <input
-                      type="file"
-                      id={`addon_image_${index}`}
-                      onChange={(e) => handleChangeAddonImage(e, index)}
-                      hidden
-                      accept="image/*"
-                    />
-                  </label>
+          {!addquery &&
+            addons.map((addon, index) => (
+              <div key={index} className="-space-y-3">
+                <div>
+                  <input
+                    type="text"
+                    name="addon_name"
+                    value={addon.addon_name}
+                    onChange={(e) => handleAddonChange(e, index)}
+                    placeholder="Name"
+                    className="px-3 py-2 border rounded w-full"
+                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveAddon(index)}
-                  className="text-white bg-red-500 p-1 rounded-full font-bold"
-                >
-                  <TbTrash />
-                </button>
+
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="number"
+                    name="price"
+                    value={addon.price}
+                    onChange={(e) => handleAddonChange(e, index)}
+                    placeholder="Price"
+                    className="px-3 py-2 border rounded w-32"
+                  />
+                  <div className="relative">
+                    <label
+                      htmlFor={`addon_image_${index}`}
+                      className="cursor-pointer mx-16"
+                    >
+                      {addon.imagePreview ? (
+                        <div className="relative">
+                          <img
+                            src={addon.imagePreview}
+                            alt="Addon preview"
+                            className="w-14 h-14 rounded-lg object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAddonImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
+                          >
+                            <TbTrash size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <img
+                          src={upload_icon}
+                          alt="Upload icon"
+                          className="w-14 h-14"
+                        />
+                      )}
+                      <input
+                        type="file"
+                        id={`addon_image_${index}`}
+                        onChange={(e) => handleChangeAddonImage(e, index)}
+                        hidden
+                        accept="image/*"
+                      />
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAddon(index)}
+                    className="text-white bg-red-500 p-1 rounded-full font-bold"
+                  >
+                    <TbTrash />
+                  </button>
+                </div>
               </div>
+            ))}
+          {!addquery && (
+            <button
+              type="button"
+              onClick={handleAddAddon}
+              className="flex items-center space-x-2 text-secondary"
+            >
+              <FaPlus />
+              <span>Add another addon</span>
+            </button>
+          )}
+        </div>
+
+        {/* more details */}
+        <div className="w-full mt-5">
+          <h5 className="h5">More Details</h5>
+          {moredetails.map((detail, index) => (
+            <div key={index} className="mb-4">
+              <input
+                type="text"
+                placeholder="Detail Name"
+                value={detail.detailname}
+                onChange={(e) =>
+                  handleDetailChange(index, "detailname", e.target.value)
+                }
+                className="px-3 py-2 border rounded w-full"
+              />
+              <textarea
+                placeholder="Detail Info ( use new lines only for bullet points )"
+                value={detail.detailinfo.join("\n")}
+                onChange={(e) =>
+                  handleDetailChange(index, "detailinfo", e.target.value)
+                }
+                className="px-3 py-2 border rounded w-full mt-2"
+                rows={4}
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveDetail(index)}
+                className="text-red-500 mt-2"
+              >
+                Remove Detail
+              </button>
             </div>
           ))}
           <button
             type="button"
-            onClick={handleAddAddon}
-            className=" flex items-center space-x-2 text-secondary"
+            onClick={handleAddDetail}
+            className="flex items-center space-x-2 text-secondary"
           >
             <FaPlus />
-            <span>Add another addon</span>
+            <span>Add another detail</span>
           </button>
         </div>
 
-        {/* Expectations Section */}
-        <div className="w-full mt-5">
-          <h5 className="h5">What User Will Get</h5>
-          <textarea
-            onChange={(e) => setExpectations(e.target.value)}
-            value={expectations}
-            placeholder="Use full stop only when to start next Expectation"
-            rows={3}
-            className="px-3 py-2 border rounded w-full"
-          />
-        </div>
         {/* Other Fields */}
         <div className="flex space-x-3 mt-6">
           <label className="flex items-center">
@@ -484,17 +570,6 @@ const onSubmitHandler = async (e) => {
               className="mr-2"
             />
             Popular
-          </label>
-        </div>
-        <div className="w-full mt-5">
-        <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={addquery}
-              onChange={(e) => setAddquery(e.target.checked)}
-              className="mr-2"
-            />
-            Redirect To Query Page
           </label>
         </div>
         {/* Submit Button */}

@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import productModel from "../models/productModel.js";
 
-// controller function to create product
+// Controller function to create product
 const createProduct = async (req, res) => {
   try {
     const {
@@ -17,6 +17,7 @@ const createProduct = async (req, res) => {
       addquery,
       expectation,
       addons,
+      moredetails,
     } = req.body;
 
     // Upload main product images
@@ -60,6 +61,23 @@ const createProduct = async (req, res) => {
       ? expectation.split(".").filter((e) => e.trim())
       : [];
 
+    // Process moredetails
+    let processedMoreDetails = [];
+    if (moredetails) {
+      const parsedMoreDetails = Array.isArray(moredetails)
+        ? moredetails
+        : JSON.parse(moredetails);
+
+      processedMoreDetails = parsedMoreDetails.map((detail) => ({
+        detailname: detail.detailname,
+        detailinfo: Array.isArray(detail.detailinfo)
+          ? detail.detailinfo
+          : typeof detail.detailinfo === 'string'
+            ? detail.detailinfo.split("\n").filter(item => item.trim())
+            : []
+      }));
+    }
+
     // Create new product
     const product = new productModel({
       name,
@@ -76,6 +94,7 @@ const createProduct = async (req, res) => {
       addons: processedAddons,
       image: imageUrls,
       date: Date.now(),
+      moredetails: processedMoreDetails,
     });
 
     await product.save();
@@ -92,7 +111,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-// controller function to delete a product
+// Controller function to delete a product
 const deleteProduct = async (req, res) => {
   try {
     await productModel.findByIdAndDelete(req.body.id);
@@ -103,7 +122,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// controller function to list all products
+// Controller function to list all products
 const getAllProduct = async (req, res) => {
   try {
     const products = await productModel.find({});
@@ -114,7 +133,7 @@ const getAllProduct = async (req, res) => {
   }
 };
 
-// controller function to fetch a single product's details
+// Controller function to fetch a single product's details
 const getProductbyId = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -126,67 +145,93 @@ const getProductbyId = async (req, res) => {
   }
 };
 
-// controller function to update product price
-const updateProductPrice = async (req, res) => {
+// Controller function for updating product name and price
+const updateProduct = async (req, res) => {
   try {
-    const { id, price, kidprice } = req.body; // Include kidprice
+    const { id, name, price } = req.body;
     const updateData = {};
 
-    if (price) updateData.price = Number(price); // Update adult price
-    if (kidprice) updateData.kidprice = Number(kidprice); // Update kid price
+    // Handle either name or price update
+    if (name !== undefined) updateData.name = name;
+    if (price !== undefined) updateData.price = Number(price);
 
-    const product = await productModel.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
+    const product = await productModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
 
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
     }
 
-    res.json({ success: true, message: "Price updated successfully" });
+    res.json({
+      success: true,
+      message: `Product updated successfully`,
+      product
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in updateProduct:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error updating product"
+    });
   }
 };
 
-// Controller to update addon price
-const updateAddonPrice = async (req, res) => {
+// Controller function for updating addon name and price
+const updateAddon = async (req, res) => {
   try {
-    const { productId, addonId, price, kidprice } = req.body;
+    const { productId, addonId, addon_name, price } = req.body;
     
     const product = await productModel.findById(productId);
     
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
     }
 
-    const addonIndex = product.addons.findIndex(addon => addon._id.toString() === addonId);
+    const addonIndex = product.addons.findIndex(
+      addon => addon._id.toString() === addonId
+    );
     
     if (addonIndex === -1) {
-      return res.status(404).json({ success: false, message: "Addon not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Addon not found"
+      });
     }
 
-    // Update price or kidprice based on input
+    // Update either addon name or price
+    if (addon_name !== undefined) {
+      product.addons[addonIndex].addon_name = addon_name;
+    }
     if (price !== undefined) {
       product.addons[addonIndex].price = Number(price);
-    }
-    if (kidprice !== undefined) {
-      product.addons[addonIndex].kidprice = Number(kidprice);
     }
 
     await product.save();
 
-    res.json({ success: true, message: "Addon price updated successfully" });
+    res.json({
+      success: true,
+      message: "Addon updated successfully",
+      addon: product.addons[addonIndex]
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in updateAddon:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error updating addon"
+    });
   }
 };
 
-// Controller to delete an addon
+// Controller function to delete an addon
 const deleteAddon = async (req, res) => {
   try {
     const { productId, addonId } = req.body;
@@ -194,17 +239,80 @@ const deleteAddon = async (req, res) => {
     const product = await productModel.findById(productId);
     
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
     }
 
-    product.addons = product.addons.filter(addon => addon._id.toString() !== addonId);
+    product.addons = product.addons.filter(
+      addon => addon._id.toString() !== addonId
+    );
 
     await product.save();
 
-    res.json({ success: true, message: "Addon deleted successfully" });
+    res.json({
+      success: true,
+      message: "Addon deleted successfully"
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error in deleteAddon:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error deleting addon"
+    });
+  }
+};
+
+const updateProductDetails = async (req, res) => {
+  try {
+    const {
+      id,
+      description,
+      description2,
+      expectations,
+      moredetails
+    } = req.body;
+
+    // Find and update the product
+    const product = await productModel.findById(id);
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    // Update fields if they are provided
+    if (description !== undefined) product.description = description;
+    if (description2 !== undefined) product.description2 = description2;
+    if (expectations !== undefined) {
+      // Split expectations by period and filter empty strings
+      product.expectations = expectations.split('.').filter(exp => exp.trim());
+    }
+    if (moredetails !== undefined) {
+      product.moredetails = moredetails.map(detail => ({
+        detailname: detail.detailname,
+        detailinfo: Array.isArray(detail.detailinfo) 
+          ? detail.detailinfo 
+          : detail.detailinfo.split('\n').filter(item => item.trim())
+      }));
+    }
+
+    await product.save();
+
+    res.json({
+      success: true,
+      message: "Product details updated successfully",
+      product
+    });
+  } catch (error) {
+    console.error("Error in updateProductDetails:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error updating product details"
+    });
   }
 };
 
@@ -213,7 +321,8 @@ export {
   deleteProduct,
   getAllProduct,
   getProductbyId,
-  updateProductPrice,
-  updateAddonPrice,
-  deleteAddon
+  updateProduct,
+  updateAddon,
+  deleteAddon,
+  updateProductDetails
 };

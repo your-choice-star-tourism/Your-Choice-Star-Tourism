@@ -6,9 +6,11 @@ import { CgMenuLeft } from "react-icons/cg";
 import { TbUserCircle } from "react-icons/tb";
 import { RiUserLine, RiShoppingBag4Line } from "react-icons/ri";
 import { ShopContext } from '../context/ShopContext';
+import { CurrencyContext } from '../context/CurrencyContext';
 
 const Header = () => {
   const { navigate, token, setToken, getCartCount, setCartItems, setCartItemsChild } = useContext(ShopContext);
+  const { selectedCurrency, setSelectedCurrency } = useContext(CurrencyContext);
   const [active, setActive] = useState(false);
   const [menuOpened, setMenuOpened] = useState(false);
 
@@ -22,7 +24,11 @@ const Header = () => {
     setToken('');
     setCartItems({});
     setCartItemsChild({});
-  }
+  };
+
+  const handleCurrencyChange = (event) => {
+    setSelectedCurrency(event.target.value);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,21 +50,20 @@ const Header = () => {
 
   return (
     <header
-    className={`fixed top-0 w-full left-0 right-0 z-50 bg-white ${
-      active ? 'bg-white py-0.5 px-2.5' : 'bg-primary px-2.5'
-    } flexBetween border-b border-slate-900/10 rounded transition-all duration-300 sm:px-16`}
-    
+      className={`fixed top-0 w-full left-0 right-0 z-50 bg-white ${
+        active ? 'bg-white py-0.5 px-2.5' : 'bg-primary px-2.5'
+      } flexBetween border-b border-slate-900/10 rounded transition-all duration-300 sm:px-16`}
     >
       {/* Logo */}
       <Link to={'/'} className='flex-1 flex items-center justify-start'>
         <img
           src={logo}
           alt="Company Logo"
-          width={128}
+          width={120}
           className='sm:flex mr-2'
         />
       </Link>
-      
+
       {/* Navbar */}
       <div className='flex-2'>
         <Navbar
@@ -71,7 +76,7 @@ const Header = () => {
           }`}
         />
       </div>
-      
+
       {/* Right Side */}
       <div className='flex-1 flex items-center justify-end gap-x-3 sm:gap-x-10'>
         <CgMenuLeft
@@ -89,7 +94,7 @@ const Header = () => {
                 <TbUserCircle className='text-[29px] cursor-pointer' />
               </div>
             ) : (
-              <button onClick={()=> navigate('/login')} className='btn-outline flexCenter gap-x-2 xxs:text-[12px]'>
+              <button onClick={() => navigate('/login')} className='btn-outline flexCenter gap-x-2 xxs:text-[12px]'>
                 Login <RiUserLine />
               </button>
             )}
@@ -97,7 +102,7 @@ const Header = () => {
           {token && (
             <>
               <ul className='bg-white p-1 w-32 ring-slate-900/5 rounded absolute right-0 top-7 hidden group-hover:flex flex-col regular-14 shadow-md'>
-                <li onClick={()=> navigate('/orders')} className='p-2 text-tertiary rounded-md hover:bg-primary cursor-pointer'>
+                <li onClick={() => navigate('/orders')} className='p-2 text-tertiary rounded-md hover:bg-primary cursor-pointer'>
                   Orders
                 </li>
                 <li onClick={logout} className='p-2 text-tertiary rounded-md hover:bg-primary cursor-pointer'>
@@ -107,6 +112,18 @@ const Header = () => {
             </>
           )}
         </div>
+
+    {/* Currency Dropdown */}
+    <div className='relative'>
+      <select
+        value={selectedCurrency}
+        onChange={handleCurrencyChange}
+        className='border-none rounded p-1 cursor-pointer'
+      >
+        <option value="AED">&#x1f1e6;&#x1f1ea; AED</option>
+        <option value="USD">&#x1f1fa;&#x1f1f8; USD</option>
+      </select>
+    </div>
       </div>
     </header>
   );

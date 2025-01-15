@@ -5,8 +5,8 @@ const productSchema = mongoose.Schema({
     description: {type:String},
     description2: {type:String},
     category: {type:String, required:true},
-    image: {type:[String], required:true},
-    price: {type:Number,},
+    image: {type:[String]},
+    price: {type:Number, required:true},
     kidprice: {type: Number},
     date: {type:Number,},
     popular: {type:Boolean},
@@ -20,6 +20,12 @@ const productSchema = mongoose.Schema({
         price: {type:Number},
         kidprice: {type:Number},
         image: {type:String},
+        }
+    ],
+    moredetails: [
+        {
+        detailname: {type:String},
+        detailinfo: {type:[String]},
         }
     ]
 })

@@ -12,9 +12,7 @@ const Cart = () => {
     books,
     navigate,
     cartItems,
-    cartItemsChild,
     updateQuantity,
-    updateQuantityChild,
   } = useContext(ShopContext);
 
   const findItemDetails = (itemId) => {
@@ -46,92 +44,66 @@ const Cart = () => {
   };
 
   const getCartItems = () => {
-    const items = [];
-    const allIds = new Set([...Object.keys(cartItems), ...Object.keys(cartItemsChild)]);
-    
-    allIds.forEach(id => {
-      const adultCount = cartItems[id] || 0;
-      const childCount = cartItemsChild[id] || 0;
-      
-      if (adultCount > 0 || childCount > 0) {
+    return Object.entries(cartItems)
+      .filter(([_, count]) => count > 0)
+      .map(([id, count]) => {
         const itemDetails = findItemDetails(id);
-        if (itemDetails) {
-          items.push({
-            item: itemDetails,
-            adultCount,
-            childCount
-          });
-        }
-      }
-    });
-    
-    return items;
+        return itemDetails ? {
+          item: itemDetails,
+          count
+        } : null;
+      })
+      .filter(item => item !== null);
   };
 
-  const totalItems = Object.values(cartItems).reduce((sum, count) => sum + count, 0) +
-    Object.values(cartItemsChild).reduce((sum, count) => sum + count, 0);
+  const totalItems = Object.values(cartItems).reduce((sum, count) => sum + count, 0);
 
-    const handleRemoveItem = async (itemId) => {
-      try {
-        // Remove from adult cart
-        await updateQuantity(itemId, 0);
-        // Remove from child cart
-        await updateQuantityChild(itemId, 0);
-      } catch (error) {
-        console.error("Error removing item:", error);
-      }
-    };
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await updateQuantity(itemId, 0);
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
+  };
 
-  const renderCartItem = (item, adultCount, childCount) => (
+  const renderQuantitySelector = (item, count) => (
+    <div className="flex items-center ring-1 ring-slate-900/5 rounded-md overflow-hidden bg-primary">
+      <button
+        onClick={() => updateQuantity(item.id, count - 1)}
+        className="p-1.5 bg-white rounded-md shadow-md"
+      >
+        <FaMinus className="text-xs" />
+      </button>
+      <p className="px-2">{count}</p>
+      <button
+        onClick={() => updateQuantity(item.id, count + 1)}
+        className="p-1.5 bg-white rounded-md shadow-md"
+      >
+        <FaPlus className="text-xs" />
+      </button>
+      <p className="px-2">Person</p>
+    </div>
+  );
+
+  const renderCartItem = ({ item, count }) => (
     <div key={item.id} className="bg-white p-2 mt-3 rounded-lg">
       <div className="flex gap-x-3">
         <div className="flex items-start gap-6">
           <img
             src={item.image?.[0]}
             alt="itemImg"
-            className="h-24 w-24 rounded"
+            className="h-16 w-16 rounded"
           />
         </div>
         <div className="flex flex-col w-full">
           <p className="font-bold text-black line-clamp-1">{item.name}</p>
-          <div className="flex items-center justify-between mt-4">
-            <div>
-              <div className="flex items-center ring-1 ring-slate-900/5 rounded-md overflow-hidden bg-primary mb-4">
-                <button
-                  onClick={() => updateQuantity(item.id, adultCount - 1)}
-                  className="p-1.5 bg-white rounded-md shadow-md"
-                >
-                  <FaMinus className="text-xs" />
-                </button>
-                <p className="px-2">{adultCount}</p>
-                <button
-                  onClick={() => updateQuantity(item.id, adultCount + 1)}
-                  className="p-1.5 bg-white rounded-md shadow-md"
-                >
-                  <FaPlus className="text-xs" />
-                </button>
-                <p className="px-2">Adult</p>
-              </div>
-              <div className="flex items-center ring-1 ring-slate-900/5 rounded-md overflow-hidden bg-primary">
-                <button
-                  onClick={() => updateQuantityChild(item.id, childCount - 1)}
-                  className="p-1.5 bg-white rounded-md shadow-md"
-                >
-                  <FaMinus className="text-xs" />
-                </button>
-                <p className="px-2">{childCount}</p>
-                <button
-                  onClick={() => updateQuantityChild(item.id, childCount + 1)}
-                  className="p-1.5 bg-white rounded-md shadow-md"
-                >
-                  <FaPlus className="text-xs" />
-                </button>
-                <p className="px-2">Child</p>
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="pt-4">
+              {renderQuantitySelector(item, count)}
             </div>
             <TbTrash
               onClick={() => handleRemoveItem(item.id)}
-              className="cursor-pointer lg:text-3xl text-secondary xxs:text-2xl xxs:mb-8 xxs:mr-2"
+              className="cursor-pointer lg:text-3xl text-secondary xxs:text-2xl xxs:mr-2"
             />
           </div>
         </div>
@@ -145,9 +117,7 @@ const Cart = () => {
         <Title title1={"Your "} title2={"Services"} title1Styles={"h3"} />
         <div className="mt-6">
           {totalItems > 0 ? (
-            getCartItems().map(({ item, adultCount, childCount }) => 
-              renderCartItem(item, adultCount, childCount)
-            )
+            getCartItems().map(cartItem => renderCartItem(cartItem))
           ) : (
             <p className="text-center text-gray-600 mt-4">
               You don't have any saved Service.

@@ -113,7 +113,7 @@ const Orders = () => {
                             <p>{item.totalAmount} {currency}</p>
                           </div>
                           <div className="flexCenter gap-x-1 sm:flex xxs:hidden">
-                            <h5 className="medium-14">Persons: </h5>
+                            <h5 className="medium-14">Person: </h5>
                             <p>{item.quantity}</p>
                           </div>
                           <div className="sm:flexCenter gap-x-1 hidden">
@@ -126,7 +126,7 @@ const Orders = () => {
                           <p className="text-gray-400">{item.paymentMethod}</p>
                         </div>
                         <div className="flex items-center gap-x-1 sm:hidden">
-                          <h5 className="medium-14">Persons: </h5>
+                          <h5 className="medium-14">Person: </h5>
                           <p>{item.quantity}</p>
                         </div>
                         <div className="flex items-center gap-x-1">
