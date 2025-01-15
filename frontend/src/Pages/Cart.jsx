@@ -81,7 +81,7 @@ const Cart = () => {
       >
         <FaPlus className="text-xs" />
       </button>
-      <p className="px-2">Person</p>
+      <p className="px-2">Quantity</p>
     </div>
   );
 
