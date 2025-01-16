@@ -669,7 +669,6 @@ export const FOOTER_LINKS = [
   {
     title: "Learn More",
     links: [
-      { label: "About Us", value: "/#aboutus" },
       { label: "Your Cart", value: "/cart#cart" },
       { label: "Book Services", value: "/tours#tours" },
     ],
@@ -701,7 +700,7 @@ export const SOCIALS = {
     },
     {
       icon: <FaInstagram />,
-      url: "https://www.instagram.com/yourchoicetourism?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+      url: "https://www.instagram.com/yourchoicestar_tourism?igsh=bjdxYWJ2cHNueDRw",
     },
     { icon: <FaXTwitter />, url: "https://www.x.com/" },
     { icon: <FaYoutube />, url: "https://www.youtube.com/" },
