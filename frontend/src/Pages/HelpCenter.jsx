@@ -179,7 +179,9 @@ const HelpCenter = () => {
             </div>
           </div>
         </section>
-        <Footer />
+      </section>
+      <section className="max-padd-container bg-white">
+        <Footer/>
       </section>
     </>
   );
