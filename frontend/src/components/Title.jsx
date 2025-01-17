@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Title = ({ title1, title2, titleStyles, title1Styles, paraStyles, para1Styles, para2Styles, para3Styles, para4Styles, para5Styles }) => {
+const Title = ({ title1, title2, titleStyles, title1Styles, paraStyles, para1Styles, para2Styles, para3Styles, para4Styles, para5Styles, para6Styles, para7Styles }) => {
   return (
     <div className={`${titleStyles} pb-1`}>
       <h2 className={`${title1Styles} h2`}>{title1}
@@ -23,6 +23,12 @@ const Title = ({ title1, title2, titleStyles, title1Styles, paraStyles, para1Sty
       </p>
       <p className={`${para5Styles} hidden xxs:text-[12px]`}>
       If you like these services, then you might also want to check out our add-ons for<br />enhanced experiences and exclusive benefits tailored to your preferences.
+      </p>
+      <p className={`${para6Styles} hidden xxs:text-[12px]`}>
+      Our hotel partners offer exceptional accommodations, ensuring guests enjoy comfort,<br />luxury, and convenience while exploring the vibrant destinations of their travels.
+      </p>
+      <p className={`${para7Styles} hidden xxs:text-[12px]`}>
+      Our testimonials on TripAdvisor highlight the genuine experiences of our guests,<br />showcasing their satisfaction and the exceptional service we provide.
       </p>
     </div>
   );
