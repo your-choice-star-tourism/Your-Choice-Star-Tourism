@@ -8,12 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        // primary: "#f5f6f2",
         primary: "#f8f6fb",
         secondary: "#452372",
         secondaryOne: "#ffbcb1",
         tertiary: "#272626",
-        // tertiary: "#404040",
         gray: {
           10: "#EEEEEE",
           20: "#A2A2A2",
@@ -28,8 +26,16 @@ export default {
         "3xl": "1680px",
         "4xl": "2200px",
       },
+      keyframes: {
+        scroll: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-100%)' },
+        }
+      },
+      animation: {
+        scroll: 'scroll 30s linear infinite',
+      },
     },
   },
   plugins: [],
 }
-
