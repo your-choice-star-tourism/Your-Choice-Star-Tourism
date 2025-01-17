@@ -1,6 +1,6 @@
 import React from 'react'
 import { TbHomeFilled } from "react-icons/tb";
-import { IoLibrary, IoMailOpen } from "react-icons/io5";
+import { IoLibrary, IoMailOpen, IoInformationCircle } from "react-icons/io5";
 import { FaRegWindowClose } from "react-icons/fa";
 import { Link, NavLink } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ const Navbar = ({containerStyles, toggleMenu, menuOpened}) => {
     const navItems = [
         {to: '/', label: 'Home', icon: <TbHomeFilled />},
         {to: '/Tours', label: 'Services', icon: <IoLibrary />},
+        {to: '/Aboutus', label: 'About', icon: <IoInformationCircle />},
         {to: '/HelpCenter', label: 'Queries', icon: <IoMailOpen />},
     ]
 
