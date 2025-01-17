@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Orders from './Pages/Orders'
 import Verify from './Pages/Verify'
 import ResetPassword from './Pages/ResetPassword'
+import About from './Pages/About'
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/tours' element={<Tours />} />
         <Route path='/HelpCenter' element={<HelpCenter />} />
+        <Route path='/Aboutus' element={<About />}/>
         <Route path='/cart' element={<Cart />} />
         <Route path='/login' element={<Login />} />
         <Route path='/place-order' element ={<PlaceOrder />} />
