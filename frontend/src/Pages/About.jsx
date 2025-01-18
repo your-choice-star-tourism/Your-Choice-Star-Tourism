@@ -27,7 +27,6 @@ import alarab from "../assets/partners/alarab.png";
 import aquaventure from "../assets/partners/aquaventure.webp";
 import {
   FaHotel,
-  FaTruck,
   FaCar,
   FaCarSide,
   FaHandshake,
@@ -36,7 +35,10 @@ import {
   FaWaterLadder,
   FaShip,
   FaTicket,
+  FaVanShuttle,
 } from "react-icons/fa6";
+import limo from "../assets/features/limo.png"
+import jetski from "../assets/features/jetski.png"
 import Title from "../components/Title";
 import { ElfsightWidget } from "react-elfsight-widget";
 
@@ -171,7 +173,7 @@ const About = () => {
           </div>
 
           {/* icons */}
-          <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-12 gap-x-16">
+          <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-12 gap-x-[1px]">
             <div className="flex flex-col items-center">
               <div className="bg-primary text-secondary rounded-full p-4 flex items-center justify-center">
                 <Link to={"/Tours"}>
@@ -183,7 +185,7 @@ const About = () => {
             <div className="flex flex-col items-center">
               <div className="bg-primary text-secondary rounded-full p-4 flex items-center justify-center">
                 <Link to={"/Tours"}>
-                  <FaTruck className="h-6 w-6" />
+                  <FaVanShuttle className="h-6 w-6" />
                 </Link>
               </div>
               <div className="mt-2 font-semibold">Transfers</div>
@@ -199,7 +201,7 @@ const About = () => {
             <div className="flex flex-col items-center">
               <div className="bg-primary text-secondary rounded-full p-4 flex items-center justify-center">
                 <Link to={"/Tours"}>
-                  <FaCarSide className="h-6 w-6" />
+                  <img src={limo} className="w-6 h-6"/>
                 </Link>
               </div>
               <div className="mt-2 font-semibold">Limousine</div>
@@ -231,7 +233,7 @@ const About = () => {
             <div className="flex flex-col items-center">
               <div className="bg-primary text-secondary rounded-full p-4 flex items-center justify-center">
                 <Link to={"/Tours"}>
-                  <FaWaterLadder className="h-6 w-6" />
+                  <img src={jetski} className="w-6 h-6" />
                 </Link>
               </div>
               <div className="mt-2 font-semibold">Water Sports</div>
