@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-
 export default {
   content: [
     "./index.html",
@@ -30,10 +29,15 @@ export default {
         scroll: {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-100%)' },
+        },
+        scrollReverse: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
         }
       },
       animation: {
-        scroll: 'scroll 30s linear infinite',
+        scroll: 'scroll 40s linear infinite',
+        scrollReverse: 'scrollReverse 40s linear infinite',
       },
     },
   },
