@@ -464,7 +464,7 @@ const About = () => {
             title1={"Hotel "}
             title2={"Partners"}
             titleStyles={"pb-10 mt-16"}
-            para6Styles={"!block"}
+            para7Styles={"!block"}
           />
         </section>
         <div className="w-full overflow-hidden relative">
