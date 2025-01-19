@@ -25,10 +25,10 @@ const Title = ({ title1, title2, titleStyles, title1Styles, paraStyles, para1Sty
       If you like these services, then you might also want to check out our add-ons for<br />enhanced experiences and exclusive benefits tailored to your preferences.
       </p>
       <p className={`${para6Styles} hidden xxs:text-[12px]`}>
-      Our service partners offer reliable support, helping clients achieve smooth<br />operations, trust, and quality as they navigate their business challenges.
+      Our service partners, who are our trusted suppliers for tours and excursions, play a vital role in delivering exceptional<br />travel experiences. They provide a wide range of high-quality services, ensuring our guests enjoy safe, memorable, and well-organized adventures tailored to their preferences.
       </p>
       <p className={`${para7Styles} hidden xxs:text-[12px]`}>
-      Our hotel partners offer exceptional accommodations, ensuring guests enjoy comfort,<br />luxury, and convenience while exploring the vibrant destinations of their travels.
+      We partner with hotels to operate multiple travel desks in their lobbies, offering seamless services to in-house guests,<br />customized travel solutions, and enhancing guest experiences with tailored itineraries and professional assistance.
       </p>
       <p className={`${para8Styles} hidden xxs:text-[12px]`}>
       Our testimonials on TripAdvisor highlight the genuine experiences of our guests,<br />showcasing their satisfaction and the exceptional service we provide.
