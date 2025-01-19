@@ -36,6 +36,7 @@ const placeOrderStripe = async (req, res) => {
         }));
 
         const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'], // Specify payment methods
             line_items,
             success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
             cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
@@ -60,6 +61,7 @@ const placeOrderStripe = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+
 
 const verifyStripe = async (req, res) => {
     const { orderId, success } = req.body;
