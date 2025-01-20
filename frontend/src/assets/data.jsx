@@ -669,6 +669,7 @@ export const FOOTER_LINKS = [
   {
     title: "Learn More",
     links: [
+      { label: "About", value: "/Aboutus" },
       { label: "Your Cart", value: "/cart#cart" },
       { label: "Book Services", value: "/tours#tours" },
     ],
@@ -696,7 +697,7 @@ export const SOCIALS = {
   links: [
     {
       icon: <FaFacebook />,
-      url: "https://www.facebook.com/yourchoicetourism/",
+      url: "https://www.facebook.com/share/1B4NgxHifb/",
     },
     {
       icon: <FaInstagram />,
